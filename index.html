@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>译の日记本</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --cream: #FFFBE8;
+  --cream-dark: #FFF3C8;
+  --card-profile: #FFFFFF;
+  --card-calendar: #FFFFFF;
+  --card-stats: #FFFFFF;
+  --card-quick: #FFFFFF;
+  --card-chart: #FFFFFF;
+  --card-summary: #FFFFFF;
+  --card-backup: #FFFFFF;
+  --card-inner: #FFFDF9;
+  --brown: #A88474;
+  --brown-dark: #7D5F52;
+  --brown-light: #C9A894;
+  --pink: #FFD6D6;
+  --pink-light: rgba(255, 214, 214, 0.5);
+  --green: #C8E4C4;
+  --green-light: rgba(200, 228, 196, 0.5);
+  --text: #6B5348;
+  --text-light: #A08B7D;
+  --radius: 28px;
+  --radius-sm: 18px;
+  --shadow: 0 6px 20px rgba(158, 122, 106, 0.12);
+  --transition: all 0.3s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #FDF3E5 0%, #F9E2C4 15%, #F9E2C4 100%);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100vh;
+}
+
+.toast-card {
+  background: var(--card-calendar);
+  border: 3px solid var(--brown-dark);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 各卡片颜色区分 */
+.toast-card.card-quick { background: var(--card-quick); }
+.toast-card.card-chart { background: var(--card-chart); }
+.toast-card.card-summary { background: var(--card-summary); }
+.toast-card.card-backup { background: var(--card-backup); }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+
+/* ===== 个人资料卡 ===== */
+.profile-toast {
+  background: var(--card-profile);
+  border: 3px solid var(--brown-dark);
+  border-radius: var(--radius);
+  padding: 22px 18px;
+  position: relative;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+}
+
+.profile-avatar,
+.profile-avatar-placeholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--brown);
+  background: var(--pink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.avatar-edit-hint {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  background: var(--brown);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 2px solid var(--cream);
+  cursor: pointer;
+}
+
+.profile-info { width: 100%; }
+
+.profile-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brown-dark);
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: center;
+  font-family: inherit;
+}
+.profile-name:focus { outline: none; }
+
+.profile-bio {
+  font-size: 13px;
+  color: var(--text-light);
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: center;
+  resize: none;
+  font-family: inherit;
+  margin-top: 4px;
+}
+.profile-bio:focus { outline: none; }
+
+.profile-edit-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--brown);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+#avatarInput { display: none; }
+
+/* ===== 打卡统计 ===== */
+.stats-card {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-box {
+  flex: 1;
+  background: var(--card-stats);
+  border: 3px solid var(--brown-dark);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  box-shadow: var(--shadow);
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* ===== 日历 ===== */
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.calendar-nav button {
+  background: var(--card-stats);
+  border: 2px solid var(--brown);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--brown-dark);
+  font-family: inherit;
+}
+.calendar-nav button:hover { background: var(--brown); color: #fff; }
+
+.calendar-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-light);
+  padding: 6px 0;
+  font-weight: 800;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 14px;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  position: relative;
+  background: var(--card-inner);
+  border: 2px solid var(--brown-light);
+  cursor: pointer;
+  min-height: 0;
+  width: 100%;
+}
+
+.calendar-day:hover { background: var(--cream-dark); border-color: var(--brown); }
+.calendar-day.empty { background: transparent; border-color: transparent; cursor: default; }
+.calendar-day.empty:hover { background: transparent; border-color: transparent; }
+.calendar-day.today { background: var(--pink-light); border-color: var(--brown); }
+
+.calendar-day .day-num {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+
+.calendar-day .day-weight {
+  font-size: 9px;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 1px 4px;
+}
+.day-weight.down { color: #5DA87A; background: #E4F5E9; }
+.day-weight.up { color: #D67B7B; background: #FCE4E4; }
+.day-weight.flat { color: var(--text-light); background: #F0EDE8; }
+
+.corner-mark {
+  position: absolute;
+  font-size: 10px;
+  line-height: 1;
+}
+.corner-mark.tl { top: 2px; left: 3px; }
+.corner-mark.tr { top: 2px; right: 3px; }
+.corner-mark.bl { bottom: 2px; left: 3px; }
+.corner-mark.br { bottom: 2px; right: 3px; }
+
+.day-prediction {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 10px;
+  opacity: 0.4;
+}
+
+/* ===== 记录按钮 ===== */
+.record-btn-wrap {
+  text-align: center;
+  margin: 6px 0;
+}
+
+.record-btn {
+  background: var(--brown);
+  color: #FFFBE8;
+  border: 3px solid var(--brown-dark);
+  border-radius: 50px;
+  padding: 16px 48px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 0 var(--brown-dark);
+  transition: var(--transition);
+}
+.record-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ===== 运动/体重小结 ===== */
+.quick-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--brown-dark);
+  font-weight: 700;
+}
+.quick-stats strong {
+  color: var(--brown-dark);
+  font-size: 17px;
+}
+.qs-divider { color: var(--brown-light); }
+
+/* ===== 体重趋势图 ===== */
+.chart-container {
+  position: relative;
+  height: 240px;
+}
+
+/* ===== 当月总结 ===== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.summary-item {
+  background: var(--card-inner);
+  border: 2px solid var(--brown-light);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: center;
+}
+.summary-item-label {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+.summary-item-value {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+.summary-item-value small { font-size: 11px; font-weight: 600; color: var(--text-light); }
+
+/* ===== 数据备份 ===== */
+.backup-row {
+  display: flex;
+  gap: 10px;
+}
+.btn-backup {
+  flex: 1;
+  padding: 10px;
+  border: 3px solid var(--brown);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  background: var(--card-stats);
+  color: var(--brown-dark);
+}
+.btn-backup:hover { background: var(--brown); color: #fff; }
+.backup-hint {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ===== 弹窗 ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(107, 83, 72, 0.35);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--card-profile);
+  border: 3px solid var(--brown-dark);
+  border-radius: var(--radius);
+  padding: 22px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(107, 83, 72, 0.25);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+.modal-close {
+  background: var(--card-stats);
+  border: 2px solid var(--brown);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--brown-dark);
+  font-family: inherit;
+}
+.modal-close:hover { background: var(--brown); color: #fff; }
+
+.form-section {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 2px dashed var(--brown-light);
+}
+.form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.form-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--brown-dark);
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.form-group { flex: 1; }
+
+.form-label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--brown-light);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--card-stats);
+  outline: none;
+  font-family: inherit;
+}
+.form-input:focus, .form-select:focus { border-color: var(--brown); background: #fff; }
+
+.exercise-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.exercise-option {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px;
+  text-align: center;
+  border: 2px solid var(--brown-light);
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 13px;
+  background: var(--card-stats);
+}
+.exercise-option.selected {
+  border-color: var(--brown);
+  background: var(--cream-dark);
+  font-weight: 800;
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--brown-light);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.toggle.active { background: var(--green); }
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.toggle.active::after { transform: translateX(20px); }
+
+.calories-hint {
+  font-size: 12px;
+  color: var(--brown-dark);
+  background: var(--green);
+  padding: 6px 10px;
+  border-radius: 10px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.period-hint {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 6px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-primary, .btn-secondary {
+  flex: 1;
+  padding: 11px;
+  border: 3px solid var(--brown);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--brown);
+  color: #FFFBE8;
+}
+.btn-primary:hover { background: var(--brown-dark); }
+.btn-secondary {
+  background: var(--card-stats);
+  color: var(--brown-dark);
+}
+.btn-secondary:hover { background: var(--brown); color: #fff; }
+
+.history-month-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.history-month-btn {
+  padding: 6px 14px;
+  border: 2px solid var(--brown-light);
+  border-radius: 20px;
+  background: var(--card-stats);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--brown-dark);
+  font-family: inherit;
+}
+.history-month-btn:hover { background: var(--brown); color: #fff; border-color: var(--brown); }
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--brown);
+  color: #FFFBE8;
+  padding: 11px 26px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 0.3s ease;
+  z-index: 2000;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 480px) {
+  body { font-size: 14px; }
+  .app { padding: 12px; }
+  .toast-card { padding: 14px; }
+  .stat-number { font-size: 24px; }
+  .summary-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="profile-toast">
+    <button class="profile-edit-btn" id="profileEditBtn" onclick="toggleProfileEdit()">✏️</button>
+    <div class="profile-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-placeholder" id="avatarPlaceholder" onclick="document.getElementById('avatarInput').click()">🐻</div>
+        <img class="profile-avatar" id="avatarImg" style="display:none;" onclick="document.getElementById('avatarInput').click()">
+        <div class="avatar-edit-hint" onclick="document.getElementById('avatarInput').click()">📷</div>
+        <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(event)">
+      </div>
+      <div class="profile-info">
+        <input type="text" class="profile-name" id="profileName" value="译" placeholder="你的名字" readonly>
+        <textarea class="profile-bio" id="profileBio" rows="2" placeholder="写一句签名吧~" readonly>好好生活，慢慢相遇 ✨</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-card">
+    <div class="stat-box">
+      <div class="stat-number" id="monthCheckinDays">0</div>
+      <div class="stat-label">本月打卡（天）</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="streakDays">0</div>
+      <div class="stat-label">连续打卡（天）</div>
+    </div>
+  </div>
+
+  <div class="toast-card">
+    <div class="card-header">
+      <div class="card-title">📅 日历</div>
+      <button class="profile-edit-btn" onclick="openHistory()">📜 历史</button>
+    </div>
+    <div class="calendar-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <div class="calendar-title" id="calendarTitle">2026年8月</div>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+
+  <div class="record-btn-wrap">
+    <button class="record-btn" onclick="openRecordModal()">📝 记录本日</button>
+  </div>
+
+  <div class="toast-card card-quick">
+    <div class="quick-stats" id="quickStats">
+      <span>🏃‍♀️ 本月已运动 <strong id="qsExerciseDays">0</strong> 天</span>
+      <span class="qs-divider">|</span>
+      <span>⚖️ 已瘦 <strong id="qsWeightLoss">0</strong> 斤</span>
+    </div>
+  </div>
+
+  <div class="toast-card card-chart">
+    <div class="card-header">
+      <div class="card-title">📈 体重趋势</div>
+    </div>
+    <div class="chart-container">
+      <canvas id="weightChart"></canvas>
+    </div>
+  </div>
+
+  <div class="toast-card card-summary">
+    <div class="card-header">
+      <div class="card-title">📊 当月总结</div>
+    </div>
+    <div class="summary-grid" id="summaryGrid"></div>
+  </div>
+
+  <div class="toast-card card-backup">
+    <div class="card-header">
+      <div class="card-title">💾 数据备份</div>
+    </div>
+    <div class="backup-row">
+      <button class="btn-backup" onclick="exportData()">📥 导出数据</button>
+      <button class="btn-backup" onclick="document.getElementById('importFile').click()">📤 导入数据</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+    <div class="backup-hint" id="syncStatus">🔄 正在同步...</div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="recordModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="recordModalTitle">记录本日</div>
+      <button class="modal-close" onclick="closeModal('recordModal')">✕</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">🗓️ 日期</div>
+      <div class="form-group">
+        <input type="date" class="form-input" id="recordDate">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">⚖️ 体重</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">早上体重</label>
+          <input type="number" class="form-input" id="morningWeight" step="0.1" min="0" placeholder="如 50.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">晚上体重</label>
+          <input type="number" class="form-input" id="eveningWeight" step="0.1" min="0" placeholder="如 50.5">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">🏃‍♀️ 运动</div>
+      <div class="exercise-options" id="exerciseOptions">
+        <div class="exercise-option" data-type="dancing" onclick="selectExercise('dancing')">💃 跳舞</div>
+        <div class="exercise-option" data-type="aerobics" onclick="selectExercise('aerobics')">🧍🏻‍♀️ 跳操</div>
+        <div class="exercise-option" data-type="swimming" onclick="selectExercise('swimming')">🏊 游泳</div>
+      </div>
+      <div class="form-row" style="margin-top: 10px;">
+        <div class="form-group">
+          <label class="form-label">时长（分钟）</label>
+          <input type="number" class="form-input" id="exerciseDuration" min="0" step="5" placeholder="如 30" oninput="updateCalories()">
+        </div>
+      </div>
+      <div class="calories-hint" id="caloriesHint" style="display:none;">预计消耗：0 kcal</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">🩸 经期</div>
+      <div class="toggle-row">
+        <span style="font-size:13px; color:var(--text-light);">这是经期第一天吗？</span>
+        <div class="toggle" id="periodToggle" onclick="togglePeriod()"></div>
+      </div>
+      <div class="period-hint" id="periodHint">勾选后将在日历连续标记5天 🩸</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">💩 排便</div>
+      <div class="toggle-row">
+        <span style="font-size:13px; color:var(--text-light);">今天有排便吗？</span>
+        <div class="toggle" id="poopToggle" onclick="togglePoop()"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="deleteRecord()">🗑️ 删除</button>
+      <button class="btn-primary" onclick="saveRecord()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header">
+      <div class="modal-title">📜 选择月份</div>
+      <button class="modal-close" onclick="closeModal('historyModal')">✕</button>
+    </div>
+    <div class="history-month-selector" id="historyMonthSelector"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ===================== 数据层 =====================
+const STORAGE_KEY = 'yidiary_data';
+
+// ===== 云存储配置 =====
+// 方案1: GitHub API（推荐，永久存储，不会过期）
+// 使用方法：
+//   1. 在 GitHub 创建一个仓库（public 或 private 都行）
+//   2. 创建 Personal Access Token: Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token
+//   3. 勾选 repo 权限（如果仓库是 private）或 public_repo（如果仓库是 public）
+//   4. 把 token、用户名、仓库名填到下面
+//   5. 数据会存在仓库的 data.json 文件里，永久不会过期
+
+const GITHUB_CONFIG = {
+  token: '',              // ← 填你的 GitHub Personal Access Token
+  owner: '',              // ← 填你的 GitHub 用户名
+  repo: '',               // ← 填你的仓库名
+  path: 'data.json'       // 数据文件路径，默认 data.json
+};
+
+// 方案2: jsonblob.com（备用，24小时过期，不推荐长期使用）
+const DEFAULT_BLOB_ID = '019fc346-b632-7c46-9fac-552a70858400';
+const JSONBLOB_API = 'https://jsonblob.com/api/jsonBlob/';
+
+let data = { profile: { avatar: '', name: '译', bio: '好好生活，慢慢相遇 ✨' }, records: {} };
+let useServer = false;
+let currentBlobId = DEFAULT_BLOB_ID;
+
+// 检查是否配置了 GitHub
+function useGitHub() {
+  return GITHUB_CONFIG.token && GITHUB_CONFIG.owner && GITHUB_CONFIG.repo;
+}
+
+function getGitHubUrl() {
+  return `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+}
+
+function getGitHubHeaders() {
+  return {
+    'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json'
+  };
+}
+
+// 从 GitHub 加载数据
+async function loadFromGitHub() {
+  const resp = await fetch(getGitHubUrl() + '?ref=main', {
+    headers: getGitHubHeaders()
+  });
+  if (!resp.ok) return null;
+  const fileData = await resp.json();
+  if (!fileData.content) return null;
+  const content = atob(fileData.content.replace(/\n/g, ''));
+  const json = JSON.parse(content);
+  // 保存 sha 用于后续更新
+  data._sha = fileData.sha;
+  return json;
+}
+
+// 保存数据到 GitHub
+async function saveToGitHub() {
+  const body = {
+    message: 'Update diary data ' + new Date().toISOString(),
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(data)))),
+    sha: data._sha || undefined
+  };
+  const resp = await fetch(getGitHubUrl(), {
+    method: 'PUT',
+    headers: getGitHubHeaders(),
+    body: JSON.stringify(body)
+  });
+  if (resp.ok) {
+    const result = await resp.json();
+    data._sha = result.content.sha;
+    return true;
+  }
+  return false;
+}
+
+// jsonblob 备用方案
+function getBlobUrl() { return JSONBLOB_API + currentBlobId; }
+
+async function autoRecoverBlob() {
+  const localRaw = localStorage.getItem(STORAGE_KEY);
+  if (!localRaw) return false;
+  try {
+    const localData = JSON.parse(localRaw);
+    const resp = await fetch(JSONBLOB_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(localData)
+    });
+    if (resp.ok) {
+      const loc = resp.headers.get('Location') || '';
+      const match = loc.match(/jsonBlob\/([a-f0-9-]+)/);
+      if (match) {
+        currentBlobId = match[1];
+        localStorage.setItem('yidiary_blob_id', currentBlobId);
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
+async function loadData() {
+  // 1. 优先用 GitHub（如果配置了）
+  if (useGitHub()) {
+    try {
+      const json = await loadFromGitHub();
+      if (json && (json.profile || (json.records && Object.keys(json.records).length > 0))) {
+        delete json._sha;
+        data = Object.assign(data, json);
+        useServer = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        console.log('[译の日记本] ✅ GitHub 数据加载成功');
+        return;
+      }
+    } catch(e) {
+      console.warn('[译の日记本] GitHub 加载失败，尝试 jsonblob:', e.message);
+    }
+  }
+
+  // 2. 尝试 jsonblob 备用
+  currentBlobId = DEFAULT_BLOB_ID;
+  try {
+    const resp = await fetch(getBlobUrl(), { headers: { 'Accept': 'application/json' } });
+    if (resp.ok) {
+      const json = await resp.json();
+      if (json && (json.profile || (json.records && Object.keys(json.records).length > 0))) {
+        data = json;
+        useServer = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        console.log('[译の日记本] ✅ jsonblob 数据加载成功');
+        return;
+      }
+    }
+    if (resp.status === 404) {
+      const recovered = await autoRecoverBlob();
+      if (recovered) {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) { data = JSON.parse(raw); return; }
+      }
+    }
+  } catch(e) {
+    console.warn('[译の日记本] jsonblob 加载失败:', e.message);
+  }
+
+  // 3. 降级到 localStorage
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { data = JSON.parse(raw); console.log('[译の日记本] 📦 使用本地数据'); return; }
+  } catch(e) {}
+  data = { profile: { avatar: '', name: '译', bio: '好好生活，慢慢相遇 ✨' }, records: {} };
+}
+
+async function saveData() {
+  // 始终存本地
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  // 1. 优先用 GitHub
+  if (useGitHub()) {
+    try {
+      const ok = await saveToGitHub();
+      if (ok) {
+        useServer = true;
+        console.log('[译の日记本] ✅ GitHub 保存成功');
+        updateSyncStatus();
+        return;
+      }
+    } catch(e) {
+      console.warn('[译の日记本] GitHub 保存失败:', e.message);
+    }
+  }
+
+  // 2. jsonblob 备用
+  currentBlobId = DEFAULT_BLOB_ID;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      let resp = await fetch(getBlobUrl(), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (resp.status === 404 && attempt === 0) {
+        const recovered = await autoRecoverBlob();
+        if (recovered) {
+          resp = await fetch(getBlobUrl(), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+      }
+      if (resp.ok) {
+        useServer = true;
+        console.log('[译の日记本] ✅ jsonblob 保存成功');
+        updateSyncStatus();
+        return;
+      }
+    } catch(e) {
+      console.warn('[译の日记本] jsonblob 保存异常, 重试', attempt + 1);
+    }
+    if (attempt < 2) await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+  }
+  console.warn('[译の日记本] ⚠️ 云端保存失败，数据仅存本地');
+  updateSyncStatus();
+}
+
+// ===================== 状态 =====================
+let currentViewDate = new Date(); // 日历当前显示月份
+let selectedExercise = null;
+let isPeriodStart = false;
+let isPoop = false;
+let editingDate = null;
+let weightChart = null;
+
+const EXERCISE_INFO = {
+  dancing:  { label: '跳舞', emoji: '💃', kcalPerMin: 250/60 },
+  aerobics: { label: '跳操', emoji: '🧍🏻‍♀️', kcalPerMin: 300/60 },
+  swimming: { label: '游泳', emoji: '🏊', kcalPerMin: 400/60 }
+};
+
+const WEEKDAYS = ['一','二','三','四','五','六','日'];
+const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+// ===================== 工具函数 =====================
+function fmtDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function parseDate(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function getMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+}
+
+// 找前一次有早体重的记录（不一定是前一天）
+function getPreviousMorningRecord(dateStr) {
+  const allDates = Object.keys(data.records).sort();
+  const idx = allDates.indexOf(dateStr);
+  if (idx <= 0) return null;
+  // 往前找
+  for (let i = idx - 1; i >= 0; i--) {
+    const prevRec = data.records[allDates[i]];
+    if (prevRec && prevRec.morningWeight != null) return prevRec;
+  }
+  return null;
+}
+
+// 预估经期：基于28天周期预测，参考历史数据微调
+function getPredictedPeriod(dateStr) {
+  const allPeriodStarts = Object.entries(data.records)
+    .filter(([d, r]) => r.periodStart)
+    .map(([d]) => d)
+    .sort();
+  if (allPeriodStarts.length < 1) return false;
+
+  // 计算平均周期，默认28天
+  let avgCycle = 28;
+  if (allPeriodStarts.length >= 2) {
+    let totalCycle = 0;
+    for (let i = 1; i < allPeriodStarts.length; i++) {
+      const d1 = parseDate(allPeriodStarts[i-1]);
+      const d2 = parseDate(allPeriodStarts[i]);
+      totalCycle += (d2 - d1) / (1000 * 60 * 60 * 24);
+    }
+    const calculated = Math.round(totalCycle / (allPeriodStarts.length - 1));
+    // 只要在26-32天范围内就用实际值，否则用28天
+    if (calculated >= 26 && calculated <= 32) {
+      avgCycle = calculated;
+    }
+  }
+
+  // 从最后一次经期头天推算下一次
+  const lastStart = allPeriodStarts[allPeriodStarts.length - 1];
+  const nextStart = addDays(parseDate(lastStart), avgCycle);
+
+  // 检查当前日期是否在预估经期内（5天）
+  const d = parseDate(dateStr);
+  for (let i = 0; i < 5; i++) {
+    const predDay = addDays(nextStart, i);
+    if (fmtDate(predDay) === dateStr) return true;
+  }
+  return false;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===================== 数据备份 =====================
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '译の日记本-备份-' + fmtDate(new Date()) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('数据已导出 📥');
+}
+
+async function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.profile && !imported.records) {
+        showToast('文件格式不对');
+        return;
+      }
+      data = imported;
+      await saveData();
+      renderAll();
+      showToast('数据已导入 ✅');
+    } catch(err) {
+      showToast('导入失败，文件格式不对');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ===================== 个人资料 =====================
+function renderProfile() {
+  const p = data.profile || {};
+  document.getElementById('profileName').value = p.name || '译';
+  document.getElementById('profileBio').value = p.bio || '';
+  if (p.avatar) {
+    document.getElementById('avatarImg').src = p.avatar;
+    document.getElementById('avatarImg').style.display = 'block';
+    document.getElementById('avatarPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('avatarImg').style.display = 'none';
+    document.getElementById('avatarPlaceholder').style.display = 'flex';
+  }
+}
+
+let profileEditing = false;
+async function toggleProfileEdit() {
+  profileEditing = !profileEditing;
+  const name = document.getElementById('profileName');
+  const bio = document.getElementById('profileBio');
+  const btn = document.getElementById('profileEditBtn');
+  if (profileEditing) {
+    name.removeAttribute('readonly');
+    bio.removeAttribute('readonly');
+    name.focus();
+    btn.textContent = '✓ 保存';
+  } else {
+    name.setAttribute('readonly', true);
+    bio.setAttribute('readonly', true);
+    data.profile = data.profile || {};
+    data.profile.name = name.value;
+    data.profile.bio = bio.value;
+    await saveData();
+    showToast('资料已保存 💾');
+  }
+}
+
+async function handleAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    // 压缩头像到 200x200 以内，减少存储体积
+    const img = new Image();
+    img.onload = async function() {
+      const canvas = document.createElement('canvas');
+      const size = Math.min(img.width, img.height, 200);
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+      data.profile = data.profile || {};
+      data.profile.avatar = canvas.toDataURL('image/jpeg', 0.7);
+      await saveData();
+      renderProfile();
+      showToast('头像已更新 🌸');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===================== 打卡统计 =====================
+function getMonthCheckinDays(date) {
+  const key = getMonthKey(date);
+  let count = 0;
+  for (const [d, rec] of Object.entries(data.records)) {
+    if (d.startsWith(key) && (rec.morningWeight != null || rec.eveningWeight != null)) {
+      count++;
+    }
+  }
+  return count;
+}
+
+function getStreakDays() {
+  let streak = 0;
+  let d = new Date();
+  // 今天没记录也可以，从今天或昨天开始
+  // 从今天往前找，只要有体重就算
+  while (true) {
+    const ds = fmtDate(d);
+    const rec = data.records[ds];
+    if (rec && (rec.morningWeight != null || rec.eveningWeight != null)) {
+      streak++;
+      d = addDays(d, -1);
+    } else {
+      // 如果今天没有但昨天有，跳过今天继续
+      const today = fmtDate(new Date());
+      if (ds === today) {
+        d = addDays(d, -1);
+        continue;
+      }
+      break;
+    }
+  }
+  return streak;
+}
+
+function renderStats() {
+  document.getElementById('monthCheckinDays').textContent = getMonthCheckinDays(currentViewDate);
+  document.getElementById('streakDays').textContent = getStreakDays();
+}
+
+// ===================== 日历 =====================
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const year = currentViewDate.getFullYear();
+  const month = currentViewDate.getMonth();
+  document.getElementById('calendarTitle').textContent = `${year}年${MONTH_NAMES[month]}`;
+
+  grid.innerHTML = '';
+  // 表头
+  WEEKDAYS.forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'calendar-weekday';
+    el.textContent = w;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(year, month, 1);
+  // 周一=0
+  let firstWeekday = firstDay.getDay() - 1;
+  if (firstWeekday < 0) firstWeekday = 6;
+
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const todayStr = fmtDate(new Date());
+
+  // 空白格
+  for (let i = 0; i < firstWeekday; i++) {
+    const el = document.createElement('div');
+    el.className = 'calendar-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const el = document.createElement('div');
+    el.className = 'calendar-day';
+    if (dateStr === todayStr) el.classList.add('today');
+    el.onclick = () => openRecordModal(dateStr);
+
+    // 日期号
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = day;
+    el.appendChild(numEl);
+
+    // 体重差值：对比前一次有早体重的记录
+    const rec = data.records[dateStr];
+    if (rec && rec.morningWeight != null) {
+      const prevRec = getPreviousMorningRecord(dateStr);
+      if (prevRec) {
+        const diff = rec.morningWeight - prevRec.morningWeight;
+        const wEl = document.createElement('div');
+        wEl.className = 'day-weight ' + (diff < 0 ? 'down' : diff > 0 ? 'up' : 'flat');
+        const sign = diff > 0 ? '+' : '';
+        wEl.textContent = sign + diff.toFixed(1);
+        el.appendChild(wEl);
+      }
+    }
+
+    // 标记放四角（最多4个）
+    const corners = [];
+    if (rec) {
+      if (rec.period) corners.push({ icon: '🩸', pos: 'tl' });
+      if (rec.exercise && rec.exercise.type) {
+        corners.push({ icon: EXERCISE_INFO[rec.exercise.type].emoji, pos: 'tr' });
+      }
+      if (rec.poop) corners.push({ icon: '💩', pos: 'bl' });
+    }
+
+    // 预估经期
+    const predictedPeriod = getPredictedPeriod(dateStr);
+    if (predictedPeriod && !rec?.period) {
+      corners.push({ icon: '🩸', pos: 'br', pred: true });
+    }
+
+    corners.forEach(c => {
+      const mEl = document.createElement('div');
+      mEl.className = 'corner-mark ' + c.pos;
+      mEl.textContent = c.icon;
+      if (c.pred) { mEl.style.opacity = '0.4'; }
+      el.appendChild(mEl);
+    });
+
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(delta) {
+  currentViewDate = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() + delta, 1);
+  renderAll();
+}
+
+function jumpToMonth(monthKey) {
+  const [y, m] = monthKey.split('-').map(Number);
+  currentViewDate = new Date(y, m - 1, 1);
+  renderAll();
+  closeModal('historyModal');
+}
+
+// ===================== 记录弹窗 =====================
+function openRecordModal(dateStr) {
+  editingDate = dateStr || fmtDate(new Date());
+  document.getElementById('recordDate').value = editingDate;
+  document.getElementById('recordModalTitle').textContent = `记录 ${editingDate}`;
+
+  const rec = data.records[editingDate] || {};
+  document.getElementById('morningWeight').value = rec.morningWeight != null ? rec.morningWeight : '';
+  document.getElementById('eveningWeight').value = rec.eveningWeight != null ? rec.eveningWeight : '';
+
+  // 运动
+  selectedExercise = (rec.exercise && rec.exercise.type) || null;
+  document.querySelectorAll('.exercise-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.type === selectedExercise);
+  });
+  document.getElementById('exerciseDuration').value = (rec.exercise && rec.exercise.duration) || '';
+  updateCalories();
+
+  // 经期
+  isPeriodStart = rec.periodStart || false;
+  document.getElementById('periodToggle').classList.toggle('active', isPeriodStart);
+  // 如果已标记为经期但不是头天，显示提示
+  if (rec.period && !rec.periodStart) {
+    document.getElementById('periodHint').textContent = '本日已在经期内（由之前记录自动标记）';
+  } else {
+    document.getElementById('periodHint').textContent = '勾选后将在日历连续标记5天 🩸';
+  }
+
+  // 排便
+  isPoop = rec.poop || false;
+  document.getElementById('poopToggle').classList.toggle('active', isPoop);
+
+  document.getElementById('recordModal').classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function selectExercise(type) {
+  if (selectedExercise === type) {
+    selectedExercise = null;
+  } else {
+    selectedExercise = type;
+  }
+  document.querySelectorAll('.exercise-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.type === selectedExercise);
+  });
+  updateCalories();
+}
+
+function updateCalories() {
+  const hint = document.getElementById('caloriesHint');
+  const duration = parseFloat(document.getElementById('exerciseDuration').value) || 0;
+  if (selectedExercise && duration > 0) {
+    const kcal = Math.round(EXERCISE_INFO[selectedExercise].kcalPerMin * duration);
+    hint.textContent = `预计消耗：约 ${kcal} kcal`;
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+function togglePeriod() {
+  isPeriodStart = !isPeriodStart;
+  document.getElementById('periodToggle').classList.toggle('active', isPeriodStart);
+}
+
+function togglePoop() {
+  isPoop = !isPoop;
+  document.getElementById('poopToggle').classList.toggle('active', isPoop);
+}
+
+async function saveRecord() {
+  const dateStr = document.getElementById('recordDate').value;
+  if (!dateStr) { showToast('请选择日期'); return; }
+
+  const mw = parseFloat(document.getElementById('morningWeight').value);
+  const ew = parseFloat(document.getElementById('eveningWeight').value);
+  const duration = parseFloat(document.getElementById('exerciseDuration').value) || 0;
+
+  const rec = data.records[dateStr] || {};
+
+  // 体重
+  if (!isNaN(mw) && mw > 0) rec.morningWeight = Math.round(mw * 10) / 10;
+  else if (rec.morningWeight != null && document.getElementById('morningWeight').value === '') delete rec.morningWeight;
+
+  if (!isNaN(ew) && ew > 0) rec.eveningWeight = Math.round(ew * 10) / 10;
+  else if (rec.eveningWeight != null && document.getElementById('eveningWeight').value === '') delete rec.eveningWeight;
+
+  // 运动
+  if (selectedExercise && duration > 0) {
+    const kcal = Math.round(EXERCISE_INFO[selectedExercise].kcalPerMin * duration);
+    rec.exercise = { type: selectedExercise, duration: duration, calories: kcal };
+  } else {
+    delete rec.exercise;
+  }
+
+  // 排便
+  if (isPoop) rec.poop = true;
+  else delete rec.poop;
+
+  // 经期头天 → 自动标记5天
+  if (isPeriodStart) {
+    rec.periodStart = true;
+    rec.period = true;
+    // 标记后续4天
+    for (let i = 1; i <= 4; i++) {
+      const d = addDays(parseDate(dateStr), i);
+      const ds = fmtDate(d);
+      const r = data.records[ds] || {};
+      r.period = true;
+      // 不覆盖 periodStart
+      if (!r.periodStart) r.period = true;
+      data.records[ds] = r;
+    }
+    showToast('经期已记录，连续5天已标记 🩸');
+  } else {
+    // 如果之前标记了 periodStart，取消则清除后续
+    if (rec.periodStart) {
+      // 清除之前自动标记的后续天
+      for (let i = 1; i <= 4; i++) {
+        const d = addDays(parseDate(dateStr), i);
+        const ds = fmtDate(d);
+        if (data.records[ds] && data.records[ds].period && !data.records[ds].periodStart) {
+          delete data.records[ds].period;
+          if (Object.keys(data.records[ds]).length === 0) delete data.records[ds];
+        }
+      }
+      delete rec.periodStart;
+      delete rec.period;
+    }
+  }
+
+  data.records[dateStr] = rec;
+  await saveData();
+
+  // 切换日历到该月
+  currentViewDate = parseDate(dateStr);
+  renderAll();
+  closeModal('recordModal');
+  showToast('已保存 ✅');
+}
+
+async function deleteRecord() {
+  if (!editingDate) return;
+  const rec = data.records[editingDate];
+  if (rec && rec.periodStart) {
+    // 清除自动标记的后续
+    for (let i = 1; i <= 4; i++) {
+      const d = addDays(parseDate(editingDate), i);
+      const ds = fmtDate(d);
+      if (data.records[ds] && data.records[ds].period && !data.records[ds].periodStart) {
+        delete data.records[ds].period;
+        if (Object.keys(data.records[ds]).length === 0) delete data.records[ds];
+      }
+    }
+  }
+  delete data.records[editingDate];
+  await saveData();
+  renderAll();
+  closeModal('recordModal');
+  showToast('已删除 🗑️');
+}
+
+// ===================== 体重趋势图 =====================
+function renderChart() {
+  const ctx = document.getElementById('weightChart').getContext('2d');
+  const year = currentViewDate.getFullYear();
+  const month = currentViewDate.getMonth();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  const labels = [];
+  const morningData = [];
+  const eveningData = [];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const rec = data.records[ds];
+    labels.push(`${d}日`);
+    morningData.push(rec && rec.morningWeight != null ? rec.morningWeight : null);
+    eveningData.push(rec && rec.eveningWeight != null ? rec.eveningWeight : null);
+  }
+
+  const datasets = [
+    {
+      label: '早上体重',
+      data: morningData,
+      borderColor: '#E89B9B',
+      backgroundColor: 'rgba(232,155,155,0.12)',
+      fill: true,
+      tension: 0.3,
+      spanGaps: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#E89B9B'
+    },
+    {
+      label: '晚上体重',
+      data: eveningData,
+      borderColor: '#7FBF9E',
+      backgroundColor: 'rgba(127,191,158,0.12)',
+      fill: true,
+      tension: 0.3,
+      spanGaps: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#7FBF9E'
+    }
+  ];
+
+  if (weightChart) weightChart.destroy();
+
+  weightChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#6B5B5B', font: { size: 12 }, usePointStyle: true }
+        },
+        tooltip: {
+          backgroundColor: '#fff',
+          titleColor: '#6B5B5B',
+          bodyColor: '#6B5B5B',
+          borderColor: '#EDE8E3',
+          borderWidth: 1,
+          padding: 10,
+          cornerRadius: 10
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#9A8A8A', font: { size: 10 }, maxRotation: 0 },
+          grid: { color: '#F5F0EE' }
+        },
+        y: {
+          ticks: { color: '#9A8A8A', font: { size: 10 } },
+          grid: { color: '#F5F0EE' }
+        }
+      }
+    }
+  });
+}
+
+// ===================== 当月总结 =====================
+function calcMonthSummary(date) {
+  const key = getMonthKey(date);
+  const records = Object.entries(data.records).filter(([d]) => d.startsWith(key)).sort();
+  const monthRecords = records.map(([d,r]) => r);
+
+  const morningWeights = monthRecords.filter(r => r.morningWeight != null).map(r => r.morningWeight);
+  const eveningWeights = monthRecords.filter(r => r.eveningWeight != null).map(r => r.eveningWeight);
+
+  // 打卡天数
+  const checkinSet = new Set();
+  records.forEach(([d, r]) => {
+    if (r.morningWeight != null || r.eveningWeight != null) checkinSet.add(d);
+  });
+
+  const exercises = monthRecords.filter(r => r.exercise);
+  const periodDays = monthRecords.filter(r => r.period).length;
+  const poopDays = monthRecords.filter(r => r.poop).length;
+  const totalDays = records.length; // 有记录的天数
+
+  // 体重变化（斤）
+  let morningChangeJin = null;
+  const morningSorted = records.filter(([d, r]) => r.morningWeight != null);
+  if (morningSorted.length >= 2) {
+    const firstMw = morningSorted[0][1].morningWeight;
+    const lastMw = morningSorted[morningSorted.length - 1][1].morningWeight;
+    morningChangeJin = Math.round((lastMw - firstMw) * 20) / 10; // kg -> 斤
+  }
+
+  // 单日最多减多少斤（早对比早，晚对比晚）
+  let maxDailyLossJin = 0;
+  for (let i = 1; i < records.length; i++) {
+    const prevRec = records[i-1][1];
+    const currRec = records[i][1];
+    // 早对早
+    if (prevRec.morningWeight != null && currRec.morningWeight != null) {
+      const loss = (prevRec.morningWeight - currRec.morningWeight) * 2; // kg -> 斤
+      if (loss > maxDailyLossJin) maxDailyLossJin = loss;
+    }
+    // 晚对晚
+    if (prevRec.eveningWeight != null && currRec.eveningWeight != null) {
+      const loss = (prevRec.eveningWeight - currRec.eveningWeight) * 2;
+      if (loss > maxDailyLossJin) maxDailyLossJin = loss;
+    }
+  }
+  maxDailyLossJin = Math.round(maxDailyLossJin * 10) / 10;
+
+  // 平均排便间隔
+  const poopDates = records.filter(([d, r]) => r.poop).map(([d]) => d).sort();
+  let avgPoopInterval = null;
+  if (poopDates.length >= 2) {
+    let totalInterval = 0;
+    for (let i = 1; i < poopDates.length; i++) {
+      const d1 = parseDate(poopDates[i-1]);
+      const d2 = parseDate(poopDates[i]);
+      totalInterval += (d2 - d1) / (1000 * 60 * 60 * 24);
+    }
+    avgPoopInterval = Math.round(totalInterval / (poopDates.length - 1) * 10) / 10;
+  }
+
+  // 打败百分比（基于：运动天数越多 + 体重下降越多 → 百分比越高）
+  let beatPercent = 0;
+  const lossJin = morningChangeJin != null ? Math.max(0, -morningChangeJin) : 0;
+  if (checkinSet.size > 0) {
+    // 公式：基础30 + 运动天数加成(每运动1天+3，上限30) + 减重加成(每斤+5，上限40)
+    const exerciseScore = Math.min(exercises.length * 3, 30);
+    const weightScore = Math.min(lossJin * 5, 40);
+    beatPercent = Math.min(30 + exerciseScore + weightScore, 95);
+    if (lossJin <= 0 && exercises.length === 0) beatPercent = Math.max(5, beatPercent);
+  }
+
+  return {
+    checkinDays: checkinSet.size,
+    morningChangeJin,
+    maxDailyLossJin,
+    exerciseCount: exercises.length,
+    periodDays,
+    poopDays,
+    avgPoopInterval,
+    beatPercent: Math.round(beatPercent),
+    totalDays
+  };
+}
+
+function renderQuickStats() {
+  const s = calcMonthSummary(currentViewDate);
+  document.getElementById('qsExerciseDays').textContent = s.exerciseCount;
+
+  // 已瘦多少斤
+  const lossJin = s.morningChangeJin != null ? Math.max(0, -s.morningChangeJin) : 0;
+  document.getElementById('qsWeightLoss').textContent = lossJin > 0 ? lossJin.toFixed(1) : '0';
+}
+
+function renderSummary() {
+  const s = calcMonthSummary(currentViewDate);
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = '';
+
+  const lossJin = s.morningChangeJin != null ? -s.morningChangeJin : null;
+  const sign = lossJin != null ? (lossJin > 0 ? '-' : lossJin < 0 ? '+' : '') : '';
+
+  const items = [
+    { label: '体重变化', value: lossJin != null ? `${sign}${Math.abs(lossJin).toFixed(1)} <small>斤</small>` : '—' },
+    { label: '运动天数', value: `${s.exerciseCount} 天` },
+    { label: '单日最多减重', value: s.maxDailyLossJin > 0 ? `-${s.maxDailyLossJin.toFixed(1)} <small>斤</small>` : '—' },
+    { label: '平均排便', value: s.avgPoopInterval != null ? `${s.avgPoopInterval} <small>天/次</small>` : '—' },
+    { label: '打败了', value: `${s.beatPercent}% <small>的减脂人 🏆</small>` },
+  ];
+
+  items.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'summary-item';
+    el.innerHTML = `<div class="summary-item-label">${it.label}</div><div class="summary-item-value">${it.value}</div>`;
+    grid.appendChild(el);
+  });
+}
+
+// ===================== 历史弹窗 =====================
+function openHistory() {
+  const months = new Set();
+  Object.keys(data.records).forEach(d => months.add(d.substring(0, 7)));
+  months.add(getMonthKey(currentViewDate));
+  months.add(getMonthKey(new Date()));
+
+  const sortedMonths = Array.from(months).sort().reverse();
+  const selector = document.getElementById('historyMonthSelector');
+  selector.innerHTML = '';
+
+  sortedMonths.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'history-month-btn';
+    btn.textContent = m.replace('-', '年') + '月';
+    btn.onclick = () => jumpToMonth(m);
+    selector.appendChild(btn);
+  });
+
+  document.getElementById('historyModal').classList.add('active');
+}
+
+// ===================== 渲染全部 =====================
+function renderAll() {
+  renderProfile();
+  renderStats();
+  renderCalendar();
+  renderQuickStats();
+  renderSummary();
+  renderChart();
+}
+
+// 初始化（异步加载数据）
+(async function() {
+  await loadData();
+  updateSyncStatus();
+  renderAll();
+  // 如果用 GitHub 存储不需要定期重建；如果用 jsonblob 也不需要了（自动恢复会处理）
+})();
+
+function updateSyncStatus() {
+  const el = document.getElementById('syncStatus');
+  if (useServer) {
+    if (useGitHub()) {
+      el.textContent = '☁️ GitHub 云同步（永久存储，多设备互通）';
+      el.style.color = '#5DA87A';
+    } else {
+      el.textContent = '☁️ 云端同步中（jsonblob，24h 可能过期）';
+      el.style.color = '#C9A050';
+    }
+  } else {
+    el.textContent = '⚠️ 云端同步不可用，数据仅存本地。建议导出备份';
+    el.style.color = '#D67B7B';
+  }
+}
+
+// 点击遮罩关闭弹窗
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+
+
+</script>
+</body>
+</html>
